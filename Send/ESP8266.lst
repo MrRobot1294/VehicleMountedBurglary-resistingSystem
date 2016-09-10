@@ -1,0 +1,57 @@
+C51 COMPILER V9.51   ESP8266                                                               01/29/2016 15:50:08 PAGE 1   
+
+
+C51 COMPILER V9.51, COMPILATION OF MODULE ESP8266
+OBJECT MODULE PLACED IN ESP8266.obj
+COMPILER INVOKED BY: F:\keil_for_arm\C51\BIN\C51.EXE ESP8266\ESP8266.c OPTIMIZE(8,SPEED) BROWSE INCDIR(.\NRF24L01;.\Dela
+                    -y;.\uart;.\ESP8266) DEBUG OBJECTEXTEND PRINT(.\ESP8266.lst) OBJECT(ESP8266.obj)
+
+line level    source
+
+   1          #include <reg52.h>
+   2          #include "uart.h"
+   3          #include "Delay.h"
+   4          #include "ESP8266.h"
+   5          
+   6          
+   7          
+   8          char *cmd[] = { "AT\r\n",                                                                                                                                                                       
+   9                                                                          "ATE0\r\n",                                                                                                                                                                     //关闭回显      
+  10                                                                          "AT+CWMODE=2\r\n",                                                                                                                                      //WiFi模式，AP模式
+  11                                                                          "AT+CWSAP=\"WiFiCar\",\"0123456789\",1,4\r\n",                      //AP模式下参数设置，ssid，pwd，通道号
+  12                                                                          "AT+RST\r\n",                                                                                                                                                           //重启模块使设置生效
+  13                                                                          "ATE0\r\n",                                                                                                                                                                     //关闭回显
+  14                                                                          "AT+CIPMUX=1\r\n",                                                                                                                                      //设启动多连接
+  15                                                                          "AT+CIPSERVER=1,8086\r\n",                                                                                                      //配置TCP服务器，开启server模式，监听端口号
+  16                                                                          "AT+CIPSTO=0\r\n"};                                                                                                                                     //设置连接超时，0为永远不会超时
+  17          
+  18          void esp8266_init()
+  19          {
+  20   1              unsigned char i;
+  21   1              
+  22   1              for(i = 0; i < 9; i++)
+  23   1              {
+  24   2                      com_send_str(cmd[i]);
+  25   2                      delay_ms(250);
+  26   2                      delay_ms(250);
+  27   2                      if(4 == i)                                                                                                                                                                                                                      //等待模块重启
+  28   2                      {
+  29   3                              delay_ms(250);
+  30   3                              delay_ms(250);
+  31   3                      }
+  32   2              }
+  33   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     58    ----
+   CONSTANT SIZE    =    123    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     27       1
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

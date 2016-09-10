@@ -1,0 +1,8 @@
+"STARTUP.obj",
+"Send.obj",
+"Delay.obj",
+"NRF24L01.obj",
+"uart.obj",
+"ESP8266.obj" 
+TO "Send" 
+RAMSIZE(256) 

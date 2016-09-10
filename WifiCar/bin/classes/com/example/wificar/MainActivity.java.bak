@@ -1,0 +1,162 @@
+package com.example.wificar;
+
+import java.io.PrintWriter;
+import java.net.Socket;
+import android.os.Bundle;
+import android.app.Activity;
+import android.content.Intent;
+import android.view.MotionEvent;
+import android.view.View;
+import android.view.View.OnTouchListener;
+import android.widget.Button;
+import android.widget.SeekBar;
+import android.widget.Toast;
+
+public class MainActivity extends Activity {
+
+	private Socket socket = null;
+	private static PrintWriter printWriter = null;
+	private SeekBar seekBar;
+	private Button button1;
+	private Button button2;
+	private Button button3;
+	private Button button4;
+	private Thread thread = null;
+
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_main);
+		// this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+
+		button1 = (Button) findViewById(R.id.buttonup);
+		button2 = (Button) findViewById(R.id.buttondown);
+		button3 = (Button) findViewById(R.id.buttonleft);
+		button4 = (Button) findViewById(R.id.buttonright);
+		seekBar = (SeekBar) findViewById(R.id.seekBar1);
+		
+		thread = new Thread(runnable);
+		thread.start();		
+		button1.setOnTouchListener(new OnTouchListener() {
+			@Override
+			public boolean onTouch(View arg0, MotionEvent arg1) {
+				// TODO Auto-generated method stub
+
+				if (arg1.getAction() == arg1.ACTION_DOWN) {
+					printWriter.print('a'); // a表示向前命令
+					printWriter.flush();
+				}
+				if (arg1.getAction() == arg1.ACTION_UP) {
+					printWriter.print('e'); // e表示停止命令
+					printWriter.flush();
+				}
+				return false;
+			}
+		});
+
+		button2.setOnTouchListener(new OnTouchListener() {
+			@Override
+			public boolean onTouch(View arg0, MotionEvent arg1) {
+				// TODO Auto-generated method stub
+				if (arg1.getAction() == arg1.ACTION_DOWN) {
+					printWriter.print('b'); // b表示向后命令
+					printWriter.flush();
+				}
+				if (arg1.getAction() == arg1.ACTION_UP) {
+					printWriter.print('f'); // f表示停止命令
+					printWriter.flush();
+				}
+				return false;
+
+			}
+		});
+
+		button3.setOnTouchListener(new OnTouchListener() {
+			@Override
+			public boolean onTouch(View arg0, MotionEvent arg1) {
+				// TODO Auto-generated method stub
+				if (arg1.getAction() == arg1.ACTION_DOWN) {
+					printWriter.print("c"); // c表示向左命令
+					printWriter.flush();
+				}
+				if (arg1.getAction() == arg1.ACTION_UP) {
+					printWriter.print("g"); // g表示停止命令
+					printWriter.flush();
+				}
+				return false;
+
+			}
+		});
+
+		button4.setOnTouchListener(new OnTouchListener() {
+			@Override
+			public boolean onTouch(View arg0, MotionEvent arg1) {
+				// TODO Auto-generated method stub
+				if (arg1.getAction() == arg1.ACTION_DOWN) {
+					printWriter.print("d"); // d表示向右命令
+					printWriter.flush();
+				}
+				if (arg1.getAction() == arg1.ACTION_UP) {
+					printWriter.print("eh"); // h表示停止命令
+					printWriter.flush();
+				}
+				return false;
+			}
+		});
+
+		
+		seekBar.setMax(200);
+		seekBar.setProgress(100);
+		seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+			int start;
+			int stop;
+
+			@Override
+			public void onStopTrackingTouch(SeekBar arg0) {
+				// TODO Auto-generated method stub
+				stop = arg0.getProgress();
+				if (stop - start > 0) {
+					for (int i = 0; i < (stop - start) / 10; i++) {
+						printWriter.print('j');
+						printWriter.flush();
+					}
+				} else {
+					for (int i = 0; i < (start - stop) / 10; i++) {
+						printWriter.print('k');
+						printWriter.flush();
+					}
+				}
+			}
+
+			@Override
+			public void onStartTrackingTouch(SeekBar arg0) {
+				// TODO Auto-generated method stub
+				start = arg0.getProgress();
+			}
+
+			@Override
+			public void onProgressChanged(SeekBar arg0, int arg1, boolean arg2) {
+				// TODO Auto-generated method stub
+			}
+		});
+
+	}
+
+	private Runnable runnable = new Runnable() {
+		public void run() {
+			try {
+				socket = new Socket(Data.getIp(),Integer.parseInt(Data.getPort()));
+				printWriter = new PrintWriter(socket.getOutputStream(), true);// 根据新建的sock建立
+				if(!socket.isConnected()){
+					thread.sleep(10000);
+					Toast.makeText(MainActivity.this, "Connect failed,please reconnect!", Toast.LENGTH_SHORT).show();
+					Intent intent = new Intent(MainActivity.this,IP_PortActivity.class);
+					MainActivity.this.startActivity(intent);					
+				}
+			}catch (Exception e) {
+				return;
+			}
+		}
+	};
+
+}

@@ -1,0 +1,81 @@
+C51 COMPILER V9.51   UART                                                                  04/14/2016 13:04:49 PAGE 1   
+
+
+C51 COMPILER V9.51, COMPILATION OF MODULE UART
+OBJECT MODULE PLACED IN uart.obj
+COMPILER INVOKED BY: F:\keil_for_arm\C51\BIN\C51.EXE uart\uart.c OPTIMIZE(8,SPEED) BROWSE INCDIR(.\Delay;.\LCD;.\uart;.\
+                    -gps;.\gsm900c;.\uart2_STC12C5A60S2;.\NRF24L01;..\≥µ‘ÿ∑¿µ¡) DEBUG OBJECTEXTEND PRINT(.\uart.lst) OBJECT(uart.obj)
+
+line level    source
+
+   1          #include "STC12C5A60S2.H"
+   2          #include "uart.h"
+   3          #include "Delay.h"
+   4          
+   5          void com_init()
+   6          {
+   7   1              SCON = 0x50;
+   8   1              TMOD = 0x20 | TMOD;
+   9   1              TH1 = 0xFD;
+  10   1              TR1 = 1;
+  11   1      }
+  12          
+  13          void com_send_byte(unsigned char s)
+  14          {
+  15   1              SBUF = s;
+  16   1              
+  17   1              while(!TI)
+  18   1              {
+  19   2              }
+  20   1              
+  21   1              TI = 0;
+  22   1      }
+  23          
+  24          void com_send_str(unsigned char m, unsigned char *s)
+  25          {
+  26   1              unsigned char x = 0;
+  27   1              
+  28   1              while(x < m)
+  29   1              {
+  30   2                      com_send_byte(s[x]);
+  31   2                      x++;
+  32   2              }
+  33   1      }
+  34          
+  35          unsigned char com_receive_byte()
+  36          {
+  37   1              RI = 0;
+  38   1              
+  39   1              return SBUF;
+  40   1      }
+  41          
+  42          void com_receive_str(unsigned char *s5)
+  43          {
+  44   1              unsigned char i = 0;
+  45   1              
+  46   1              while(i < 10)
+  47   1              {
+  48   2                      if(RI)
+  49   2                      {
+  50   3                       s5[i] = com_receive_byte();
+  51   3                       i++;
+  52   3                   RI = 0;
+  53   3                      }
+  54   2              }
+C51 COMPILER V9.51   UART                                                                  04/14/2016 13:04:49 PAGE 2   
+
+  55   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    103    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----       6
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
