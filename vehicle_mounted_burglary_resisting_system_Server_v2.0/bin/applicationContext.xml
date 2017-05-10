@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.3.xsd
+		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+
+	<bean id="TCPServer" class="com.nj.cjy.safecar.server.impl.TCPServerImpl"
+		scope="singleton" destroy-method="serverDestroy"></bean>
+	<bean id="SocketMapImpl" class="com.nj.cjy.safecar.server.impl.SocketMapImpl"
+		scope="singleton" destroy-method="socketMapDestroy"></bean>
+	<bean id="Link" class="com.nj.cjy.safecar.server.impl.LinkImpl"
+		scope="prototype" destroy-method="linkDestroy"></bean>
+
+	<bean id="ThreadPool" class="com.nj.cjy.safecar.thread.impl.ThreadPoolImpl"
+		scope="singleton" destroy-method="threadPoolClose"></bean>
+	<bean id="TCPSocketInit" class="com.nj.cjy.safecar.thread.impl.TCPSocketInit"
+		scope="prototype"></bean>
+	<bean id="UserServiceThread" class="com.nj.cjy.safecar.thread.impl.UserServiceThread"
+		scope="prototype"></bean>
+	<bean id="SocketThread" class="com.nj.cjy.safecar.thread.impl.SocketThread"
+		scope="prototype"></bean>
+
+	<bean id="UserSoket" class="com.nj.cjy.safecar.server.impl.UserSoketImpl"
+		scope="prototype" destroy-method="userSocketDestory"></bean>
+
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+		destroy-method="close">
+		<property name="driverClass" value="com.mysql.jdbc.Driver" />
+		<property name="jdbcUrl"
+			value="jdbc:mysql://localhost:3306/XXXX?useUnicode=true&amp;characterEncoding=UTF-8" />
+		<property name="user" value="XXXX" />
+		<property name="password" value="XXXX" />
+		<property name="initialPoolSize">
+			<value>10</value>
+		</property>
+		<property name="minPoolSize">
+			<value>5</value>
+		</property>
+		<property name="maxPoolSize">
+			<value>500</value>
+		</property>
+		<property name="acquireIncrement">
+			<value>5</value>
+		</property>
+		<property name="maxIdleTime">
+			<value>10</value>
+		</property>
+		<property name="maxStatements">
+			<value>0</value>
+		</property>
+		<!--每60秒检查所有连接池中的空闲连接。Default: 0 -->
+		<property name="idleConnectionTestPeriod">
+			<value>60</value>
+		</property>
+		<!--定义在从数据库获取新连接失败后重复尝试的次数。Default: 30 -->
+		<property name="acquireRetryAttempts">
+			<value>30</value>
+		</property>
+	</bean>
+
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean"
+		destroy-method="destroy">
+		<property name="dataSource" ref="dataSource" />
+		<property name="mappingLocations"
+			value="classpath:com/nj/cjy/safecar/mappings/*.hbm.xml"></property>
+		<property name="configLocation" value="classpath:hibernate.cfg.xml"></property>
+		<property name="hibernateProperties">
+			<value>
+				hibernate.dialect=org.hibernate.dialect.MySQL5Dialect
+				hibernate.hbm2ddl.auto=update
+				hibernate.show_sql=true
+				hibernate.format_sql=true
+			</value>
+		</property>
+	</bean>
+
+	<bean id="User" class="com.nj.cjy.safecar.mappings.User" scope="prototype"></bean>
+	<bean id="Car" class="com.nj.cjy.safecar.mappings.Car" scope="prototype"></bean>
+	<bean id="CarLocation" class="com.nj.cjy.safecar.mappings.CarLocation"
+		scope="prototype"></bean>
+
+	<bean id="UserDaoImpl" class="com.nj.cjy.safecar.dao.impl.UserDaoImpl"></bean>
+	<bean id="CarDaoImpl" class="com.nj.cjy.safecar.dao.impl.CarDaoImpl"></bean>
+	<bean id="CarLocationDaoImpl" class="com.nj.cjy.safecar.dao.impl.CarLocationDaoImpl"></bean>
+
+	<bean id="UserServiceImpl" class="com.nj.cjy.safecar.service.Impl.UserServiceImpl"></bean>
+	<bean id="CarServiceImpl" class="com.nj.cjy.safecar.service.Impl.CarServiceImpl"></bean>
+	<bean id="CarLocationServiceImpl" class="com.nj.cjy.safecar.service.Impl.CarLocationServiceImpl"></bean>
+
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="*" rollback-for="com.nj.cjy.safecar.exception.Exception" />
+		</tx:attributes>
+	</tx:advice>
+
+	<aop:config>
+		<aop:pointcut expression="execution(* com.nj.cjy.safecar.service.*.*(..))"
+			id="txPointcut" />
+		<aop:advisor advice-ref="txAdvice" pointcut-ref="txPointcut" />
+	</aop:config>
+
+</beans>

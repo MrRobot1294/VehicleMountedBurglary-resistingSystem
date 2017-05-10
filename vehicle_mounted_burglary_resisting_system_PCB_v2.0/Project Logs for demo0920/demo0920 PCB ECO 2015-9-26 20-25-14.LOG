@@ -1,0 +1,44 @@
+Added Component: Designator=c1(CON2)
+Added Component: Designator=C2(0805C)
+Added Component: Designator=C3(0805C)
+Added Component: Designator=C4(RB470U)
+Added Component: Designator=R1(0805)
+Added Component: Designator=SW1(SWD)
+Added Component: Designator=U1(DIP40½ôËø×ù)
+Added Component: Designator=XTAL1(XTAL)
+Added Pin To Net: NetName=GND Pin=c1-1
+Added Pin To Net: NetName=VCC Pin=c1-2
+Added Pin To Net: NetName=GND Pin=C2-1
+Added Pin To Net: NetName=XATL2 Pin=C2-2
+Added Pin To Net: NetName=GND Pin=C3-1
+Added Pin To Net: NetName=XATL1 Pin=C3-2
+Added Pin To Net: NetName=VCC Pin=C4-1
+Added Pin To Net: NetName=RST Pin=C4-2
+Added Pin To Net: NetName=GND Pin=R1-1
+Added Pin To Net: NetName=RST Pin=R1-2
+Added Pin To Net: NetName=RST Pin=SW1-1
+Added Pin To Net: NetName=VCC Pin=SW1-2
+Added Pin To Net: NetName=RST Pin=U1-9
+Added Pin To Net: NetName=XATL2 Pin=U1-18
+Added Pin To Net: NetName=XATL1 Pin=U1-19
+Added Pin To Net: NetName=GND Pin=U1-20
+Added Pin To Net: NetName=Netp1_9 Pin=U1-32
+Added Pin To Net: NetName=Netp1_8 Pin=U1-33
+Added Pin To Net: NetName=Netp1_7 Pin=U1-34
+Added Pin To Net: NetName=Netp1_6 Pin=U1-35
+Added Pin To Net: NetName=Netp1_5 Pin=U1-36
+Added Pin To Net: NetName=Netp1_4 Pin=U1-37
+Added Pin To Net: NetName=Netp1_3 Pin=U1-38
+Added Pin To Net: NetName=Netp1_2 Pin=U1-39
+Added Pin To Net: NetName=VCC Pin=U1-40
+Added Pin To Net: NetName=XATL1 Pin=XTAL1-1
+Added Pin To Net: NetName=XATL2 Pin=XTAL1-2
+Added Member To Class: ClassName=demo0920 Member=Component c1 con2
+Added Member To Class: ClassName=demo0920 Member=Component C2 22
+Added Member To Class: ClassName=demo0920 Member=Component C3 22
+Added Member To Class: ClassName=demo0920 Member=Component C4 CAPD
+Added Member To Class: ClassName=demo0920 Member=Component R1 10k
+Added Member To Class: ClassName=demo0920 Member=Component SW1 SW
+Added Member To Class: ClassName=demo0920 Member=Component U1 AT89C51
+Added Member To Class: ClassName=demo0920 Member=Component XTAL1 CRYSTAL
+Added Room: Name=demo0920

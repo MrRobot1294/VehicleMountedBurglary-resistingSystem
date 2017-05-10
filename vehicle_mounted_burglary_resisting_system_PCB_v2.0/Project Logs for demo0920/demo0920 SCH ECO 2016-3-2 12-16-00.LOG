@@ -1,0 +1,2 @@
+Remove Pin=AMS1117_1-3 From Net=3.3_1
+Remove Pin=AMS1117_2-3 From Net=3.3_2

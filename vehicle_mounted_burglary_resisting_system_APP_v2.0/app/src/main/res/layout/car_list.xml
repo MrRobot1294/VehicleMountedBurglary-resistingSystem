@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/state"
+        android:layout_width="30sp"
+        android:layout_height="30sp"
+        android:layout_margin="5dp"
+        android:adjustViewBounds="true"
+        android:maxHeight="100px"
+        android:scaleType="centerCrop"/>
+    <TextView
+        android:id="@+id/carnumber"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/state"
+        android:layout_alignBottom="@id/state"
+        android:layout_marginBottom="-8dp"
+        android:textSize="38sp"/>
+    <ImageView
+        android:id="@+id/delete"
+        android:layout_width="30sp"
+        android:layout_height="30sp"
+        android:layout_margin="5dp"
+        android:adjustViewBounds="true"
+        android:maxHeight="100px"
+        android:scaleType="centerCrop"
+        android:layout_alignParentRight="true" />
+    <!--<ImageView-->
+        <!--android:layout_width="40sp"-->
+        <!--android:layout_height="30sp"-->
+        <!--android:layout_margin="5px"-->
+        <!--android:src="@mipmap/alert"-->
+        <!--android:adjustViewBounds="true"-->
+        <!--android:layout_below="@id/state"-->
+        <!--android:maxHeight="100px"-->
+        <!--android:scaleType="centerInside"/>-->
+</RelativeLayout>

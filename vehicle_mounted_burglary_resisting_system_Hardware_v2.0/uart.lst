@@ -1,0 +1,129 @@
+C51 COMPILER V9.51   UART                                                                  05/03/2017 15:39:48 PAGE 1   
+
+
+C51 COMPILER V9.51, COMPILATION OF MODULE UART
+OBJECT MODULE PLACED IN uart.obj
+COMPILER INVOKED BY: F:\keil_for_arm\C51\BIN\C51.EXE uart\uart.c OPTIMIZE(8,SPEED) BROWSE INCDIR(.\Delay;.\LCD;.\uart;.\
+                    -gps;.\gsm900c;.\uart2_STC12C5A60S2;.\NRF24L01;..\≥µ‘ÿ∑¿µ¡) DEBUG OBJECTEXTEND PRINT(.\uart.lst) OBJECT(uart.obj)
+
+line level    source
+
+   1          #include "STC12C5A60S2.H"
+   2          #include "uart.h"
+   3          #include "Delay.h"
+   4          
+   5          void com_init()
+   6          {
+   7   1              SCON = 0x50;
+   8   1              TMOD = 0x20 | TMOD;
+   9   1              TH1 = 0xFD;
+  10   1              TR1 = 1;
+  11   1      }
+  12          
+  13          void com_send_byte(unsigned char s)
+  14          {
+  15   1              SBUF = s;
+  16   1              
+  17   1              while(!TI)
+  18   1              {
+  19   2              }
+  20   1              
+  21   1              TI = 0;
+  22   1      }
+  23          
+  24          void com_send_str(unsigned char m, unsigned char *s)
+  25          {
+  26   1              unsigned char x = 0;
+  27   1              
+  28   1              while(x < m)
+  29   1              {
+  30   2                      com_send_byte(s[x]);
+  31   2                      x++;
+  32   2              }
+  33   1      }
+  34          
+  35          void com_send_str2(unsigned char *s)
+  36          {
+  37   1              unsigned char x = 0;
+  38   1              
+  39   1              while(s[x] != '\0')
+  40   1              {
+  41   2                      com_send_byte(s[x]);
+  42   2                      x++;
+  43   2              }
+  44   1      }
+  45          
+  46          void com_send_str3(unsigned char m, unsigned char *s)
+  47          {
+  48   1              unsigned char x = m;
+  49   1              
+  50   1              while(s[x] != '\r')
+  51   1              {
+  52   2                      com_send_byte(s[x]);
+  53   2                      x++;
+  54   2              }
+C51 COMPILER V9.51   UART                                                                  05/03/2017 15:39:48 PAGE 2   
+
+  55   1      }
+  56          
+  57          void com_send_str4(unsigned char m, unsigned char n, unsigned char *s)
+  58          {
+  59   1              unsigned char x = 0;
+  60   1              while(s[x] != m)
+  61   1              {
+  62   2                      x++;
+  63   2              }
+  64   1              
+  65   1              while(s[x] != n)
+  66   1              {
+  67   2                      com_send_byte(s[x]);
+  68   2                      x++;
+  69   2              }
+  70   1      }
+  71          
+  72          void com_send_str5(unsigned char *s)
+  73          {
+  74   1              unsigned char x = 0;
+  75   1              
+  76   1              while(s[x] != '\n')
+  77   1              {
+  78   2                      com_send_byte(s[x]);
+  79   2                      x++;
+  80   2              }
+  81   1      }
+  82          
+  83          unsigned char com_receive_byte()
+  84          {
+  85   1              RI = 0;
+  86   1              
+  87   1              return SBUF;
+  88   1      }
+  89          
+  90          void com_receive_str(unsigned char *s5)
+  91          {
+  92   1              unsigned char i = 0;
+  93   1              
+  94   1              while(i < 10)
+  95   1              {
+  96   2                      if(RI)
+  97   2                      {
+  98   3                       s5[i] = com_receive_byte();
+  99   3                       i++;
+ 100   3                   RI = 0;
+ 101   3                      }
+ 102   2              }
+ 103   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    256    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----      18
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

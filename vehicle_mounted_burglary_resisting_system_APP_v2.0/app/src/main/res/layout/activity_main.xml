@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.example.safecar.MainActivity">
+
+    <TextView
+        android:id="@+id/test"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hello World!" />
+
+    <Button
+        android:id="@+id/buttontest"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/test"
+        android:layout_alignLeft="@id/test"
+        android:text="定位sdk"/>
+    <Button
+        android:id="@+id/buttontest2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/buttontest"
+        android:layout_alignLeft="@id/test"
+        android:text="绑定service"/>
+    <Button
+        android:id="@+id/buttontest3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/buttontest2"
+        android:layout_alignLeft="@id/test"
+        android:text="解绑"/>
+    <EditText
+        android:id="@+id/test2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/buttontest3"
+        android:layout_alignLeft="@id/test" />
+    <Button
+        android:id="@+id/buttontest4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/test2"
+        android:layout_alignLeft="@id/test"
+        android:text="发送"/>
+    <TextView
+        android:id="@+id/test3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/buttontest4"
+        android:layout_alignLeft="@id/test"
+        android:text="Hello World!" />
+    <Button
+        android:id="@+id/buttontest5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/test3"
+        android:layout_alignLeft="@id/test"
+        android:text="登录"/>
+</RelativeLayout>

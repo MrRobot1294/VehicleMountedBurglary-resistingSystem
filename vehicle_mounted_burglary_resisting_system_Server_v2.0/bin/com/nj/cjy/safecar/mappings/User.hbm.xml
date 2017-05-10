@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated 2017-4-3 20:18:22 by Hibernate Tools 3.5.0.Final -->
+<hibernate-mapping>
+    <class name="com.nj.cjy.safecar.mappings.User" table="USER">
+        <id name="id" type="int">
+            <column name="ID" />
+            <generator class="native" />
+        </id>
+        <property name="name" type="java.lang.String">
+            <column name="NAME" />
+        </property>
+        <property name="telePhoneNumber" type="java.lang.String" not-null="true" unique="true">
+            <column name="TELEPHONE_NUMBER" />
+        </property>
+        <property name="password" type="java.lang.String" not-null="true">
+            <column name="PASSWORD" />
+        </property>
+        <property name="identity" type="java.lang.String" not-null="true">
+            <column name="IDENTITY" />
+        </property>
+        <set name="cars" table="CAR" inverse="true" lazy="false">
+            <key>
+                <column name="HOST" />
+            </key>
+            <one-to-many class="com.nj.cjy.safecar.mappings.Car" />
+        </set>
+    </class>
+</hibernate-mapping>

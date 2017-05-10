@@ -1,0 +1,565 @@
+C51 COMPILER V9.51   GSM900C                                                               05/03/2017 15:39:49 PAGE 1   
+
+
+C51 COMPILER V9.51, COMPILATION OF MODULE GSM900C
+OBJECT MODULE PLACED IN gsm900c.obj
+COMPILER INVOKED BY: F:\keil_for_arm\C51\BIN\C51.EXE gsm900c\gsm900c.c OPTIMIZE(8,SPEED) BROWSE INCDIR(.\Delay;.\LCD;.\u
+                    -art;.\gps;.\gsm900c;.\uart2_STC12C5A60S2;.\NRF24L01;..\≥µ‘ÿ∑¿µ¡) DEBUG OBJECTEXTEND PRINT(.\gsm900c.lst) OBJECT(gsm900c.
+                    -obj)
+
+line level    source
+
+   1          #include "STC12C5A60S2.H"
+   2          #include "uart2_STC12C5A60S2.h"
+   3          #include <stdio.h>
+   4          #include "Delay.h"
+   5          #include "uart.h"
+   6          #include "gsm900c.h"
+   7          #include "car.h"
+   8          #include "gps.h"
+   9          
+  10          unsigned char xdata GPGGA_Buffer[68] = {0};
+  11          
+  12          unsigned char SEC_TEMP[2] = {0};
+  13          
+  14          int SEC1 = 0;
+  15          // unsigned char xdata GPRMC_Buffer[68] = {0};
+  16          
+  17          unsigned char a[4] = {0};
+  18          
+  19          unsigned char xdata Control[2][20] = {"AT\r",
+  20                                                    "AT+CMGF=0\r"
+  21                                               };
+  22          unsigned char xdata C_Word[8][40] = {"AT+CMGS=105\r",
+  23                                                 "0011000D91688160063821F90008AA",
+  24                                                 "5A00000000003A00000000003A0000000000",
+  25                                                 "208F665DF288AB76D78BF753CA65F662A58B66",
+  26                                                 "00207EAC5EA6004E000000005EA600000000",
+  27                                                 "52060000000079D200207ECF",
+  28                                                 "5EA600450000000000005EA600000000",
+  29                                                 "52060000000079D2"
+  30                                            };
+  31          
+  32          /*unsigned char xdata C_Word[8][40] = {"AT+CMGS=105\r",
+  33                                                 "0011000D91688153910588F20008AA",
+  34                                                                             "5A00000000003A00000000003A0000000000",
+  35                                                 "208F665DF288AB76D78BF753CA65F662A58B66",
+  36                                                 "00207EAC5EA6004E000000005EA600000000",
+  37                                                 "52060000000079D200207ECF",
+  38                                                 "5EA600450000000000005EA600000000",
+  39                                                 "52060000000079D2"
+  40                                            };*/
+  41          unsigned char xdata Send[3] = {0x1A, '\r', '\n'};
+  42          unsigned char xdata C_Words[250] = {0};
+  43          
+  44          unsigned char xdata Rewrite_Close[7] = {"ATE0\r\n"};
+  45          
+  46          //unsigned char xdata E_Control[2][20] = {"AT\r",
+  47          //                                        "AT+CMGF=1\r"
+  48          //                                      };
+  49          
+  50          //unsigned char xdata Unread_Message[25] = {"AT+CMGL=\"REC UNREAD\"\r\n"};
+  51          
+  52          //unsigned char xdata Read_Message_Clean[15] = {"AT+CMGD=1,2\r\n"};
+  53          
+C51 COMPILER V9.51   GSM900C                                                               05/03/2017 15:39:49 PAGE 2   
+
+  54          unsigned char xdata Message_Received[50] = {0};
+  55          
+  56          unsigned char xdata CarNumber[20] = {"453130303030"};
+  57          
+  58          void message_send()
+  59          {
+  60   1              sprintf(C_Words, "%s%s\0", C_Word[1], C_Word[2]);
+  61   1              sprintf(C_Words, "%s%s\0", C_Words, C_Word[3]);
+  62   1              sprintf(C_Words, "%s%s\0", C_Words, C_Word[4]);
+  63   1              sprintf(C_Words, "%s%s\0", C_Words, C_Word[5]);
+  64   1              sprintf(C_Words, "%s%s\0", C_Words, C_Word[6]);
+  65   1              sprintf(C_Words, "%s%s\0", C_Words, C_Word[7]);
+  66   1              uart2_send_str2(Control[0]);
+  67   1              Delay_s(2);
+  68   1              RI = 0;
+  69   1              uart2_send_str2(Control[1]);
+  70   1              Delay_s(2);
+  71   1              RI = 0;
+  72   1              uart2_send_str2(C_Word[0]);
+  73   1              Delay_s(2);
+  74   1              RI = 0;
+  75   1              uart2_send_str2(C_Words);
+  76   1              Delay_s(2);
+  77   1              RI = 0;
+  78   1              uart2_send_str1(2, Send);
+  79   1              Delay_s(2);
+  80   1              RI = 0;
+  81   1      }
+  82          
+  83          void DEC_change_to_HEX(unsigned char b)
+  84          {
+  85   1              unsigned char temp = 0;
+  86   1              
+  87   1              if(b >= '0' && b <= '9')
+  88   1              {
+  89   2                      a[0] = '0';
+  90   2                      a[1] = '0';
+  91   2                      a[2] = '3';
+  92   2                      a[3] = b;
+  93   2              }
+  94   1              else
+  95   1              {
+  96   2                      if(b >= 'A' && b <= 'O')
+  97   2                      {
+  98   3                              a[0] = '0';
+  99   3                          a[1] = '0';
+ 100   3                          a[2] = '4';
+ 101   3                              
+ 102   3                              if((temp = b - 'A') < 9)
+ 103   3                              {
+ 104   4                                      a[3] = temp + 1 + '0';
+ 105   4                              }
+ 106   3                              else
+ 107   3                              {
+ 108   4                                      temp = b - 'J';
+ 109   4                                      a[3] = temp + 'A';
+ 110   4                              }
+ 111   3                      }
+ 112   2                      if(b >= 'P' && b <= 'Z')
+ 113   2                      {
+ 114   3                              a[0] = '0';
+ 115   3                          a[1] = '0';
+C51 COMPILER V9.51   GSM900C                                                               05/03/2017 15:39:49 PAGE 3   
+
+ 116   3                          a[2] = '5';
+ 117   3                              
+ 118   3                              if((temp = b - 'P') < 10)
+ 119   3                              {
+ 120   4                                      a[3] = temp + '0';
+ 121   4                              }
+ 122   3                              else
+ 123   3                              {
+ 124   4                                      a[3] = 'A';
+ 125   4                              }
+ 126   3                      }
+ 127   2              }
+ 128   1      }
+ 129          
+ 130          void MIN_change_to_SEC()
+ 131          {
+ 132   1              SEC1 = ((GPGGA_Buffer[22] - '0') * 100 + (GPGGA_Buffer[23] - '0') * 10 + (GPGGA_Buffer[24] - '0')) * 60 /
+             - 1000;
+ 133   1              
+ 134   1              SEC_TEMP[0] = SEC1 / 10 + '0';
+ 135   1              SEC_TEMP[1] = SEC1 % 10 + '0';
+ 136   1              
+ 137   1              DEC_change_to_HEX(SEC_TEMP[0]);
+ 138   1              C_Word[5][4] = a[0];
+ 139   1              C_Word[5][5] = a[1];
+ 140   1              C_Word[5][6] = a[2];
+ 141   1              C_Word[5][7] = a[3];
+ 142   1              
+ 143   1              DEC_change_to_HEX(SEC_TEMP[1]);
+ 144   1              C_Word[5][8] = a[0];
+ 145   1              C_Word[5][9] = a[1];
+ 146   1              C_Word[5][10] = a[2];
+ 147   1              C_Word[5][11] = a[3];
+ 148   1              
+ 149   1              
+ 150   1              
+ 151   1              SEC1 = ((GPGGA_Buffer[36] - '0') * 100 + (GPGGA_Buffer[37] - '0') * 10 + (GPGGA_Buffer[38] - '0')) * 60 /
+             - 1000;
+ 152   1              
+ 153   1              SEC_TEMP[0] = SEC1 / 10 + '0';
+ 154   1              SEC_TEMP[1] = SEC1 % 10 + '0';
+ 155   1              
+ 156   1              DEC_change_to_HEX(SEC_TEMP[0]);
+ 157   1              C_Word[7][4] = a[0];
+ 158   1              C_Word[7][5] = a[1];
+ 159   1              C_Word[7][6] = a[2];
+ 160   1              C_Word[7][7] = a[3];
+ 161   1              
+ 162   1              DEC_change_to_HEX(SEC_TEMP[1]);
+ 163   1              C_Word[7][8] = a[0];
+ 164   1              C_Word[7][9] = a[1];
+ 165   1              C_Word[7][10] = a[2];
+ 166   1              C_Word[7][11] = a[3];
+ 167   1              
+ 168   1      }
+ 169          
+ 170          void handle_time()
+ 171          {
+ 172   1              int hour = 0;
+ 173   1              
+ 174   1              hour = (((GPGGA_Buffer[8] - '0') + 8) + (GPGGA_Buffer[7] - '0') * 10) % 24;
+ 175   1              
+C51 COMPILER V9.51   GSM900C                                                               05/03/2017 15:39:49 PAGE 4   
+
+ 176   1              DEC_change_to_HEX(hour / 10 + '0');
+ 177   1              C_Word[2][2] = a[0];
+ 178   1              C_Word[2][3] = a[1];
+ 179   1              C_Word[2][4] = a[2];
+ 180   1              C_Word[2][5] = a[3];
+ 181   1              
+ 182   1              DEC_change_to_HEX(hour % 10 + '0');
+ 183   1              C_Word[2][6] = a[0];
+ 184   1              C_Word[2][7] = a[1];
+ 185   1              C_Word[2][8] = a[2];
+ 186   1              C_Word[2][9] = a[3];
+ 187   1              
+ 188   1              DEC_change_to_HEX(GPGGA_Buffer[9]);
+ 189   1              C_Word[2][14] = a[0];
+ 190   1              C_Word[2][15] = a[1];
+ 191   1              C_Word[2][16] = a[2];
+ 192   1              C_Word[2][17] = a[3];
+ 193   1              
+ 194   1              DEC_change_to_HEX(GPGGA_Buffer[10]);
+ 195   1              C_Word[2][18] = a[0];
+ 196   1              C_Word[2][19] = a[1];
+ 197   1              C_Word[2][20] = a[2];
+ 198   1              C_Word[2][21] = a[3];
+ 199   1              
+ 200   1              DEC_change_to_HEX(GPGGA_Buffer[11]);
+ 201   1              C_Word[2][26] = a[0];
+ 202   1              C_Word[2][27] = a[1];
+ 203   1              C_Word[2][28] = a[2];
+ 204   1              C_Word[2][29] = a[3];
+ 205   1              
+ 206   1              DEC_change_to_HEX(GPGGA_Buffer[12]);
+ 207   1              C_Word[2][30] = a[0];
+ 208   1              C_Word[2][31] = a[1];
+ 209   1              C_Word[2][32] = a[2];
+ 210   1              C_Word[2][33] = a[3];
+ 211   1      }
+ 212          
+ 213          void full_C_Word()
+ 214          {
+ 215   1              handle_time();
+ 216   1              
+ 217   1              DEC_change_to_HEX(GPGGA_Buffer[17]);
+ 218   1              C_Word[4][16] = a[0];
+ 219   1              C_Word[4][17] = a[1];
+ 220   1              C_Word[4][18] = a[2];
+ 221   1              C_Word[4][19] = a[3];
+ 222   1              
+ 223   1              DEC_change_to_HEX(GPGGA_Buffer[18]);
+ 224   1              C_Word[4][20] = a[0];
+ 225   1              C_Word[4][21] = a[1];
+ 226   1              C_Word[4][22] = a[2];
+ 227   1              C_Word[4][23] = a[3];
+ 228   1              
+ 229   1              DEC_change_to_HEX(GPGGA_Buffer[19]);
+ 230   1              C_Word[4][28] = a[0];
+ 231   1              C_Word[4][29] = a[1];
+ 232   1              C_Word[4][30] = a[2];
+ 233   1              C_Word[4][31] = a[3];
+ 234   1              
+ 235   1              DEC_change_to_HEX(GPGGA_Buffer[20]);
+ 236   1              C_Word[4][32] = a[0];
+ 237   1              C_Word[4][33] = a[1];
+C51 COMPILER V9.51   GSM900C                                                               05/03/2017 15:39:49 PAGE 5   
+
+ 238   1              C_Word[4][34] = a[2];
+ 239   1              C_Word[4][35] = a[3];
+ 240   1              
+ 241   1              
+ 242   1              DEC_change_to_HEX(GPGGA_Buffer[30]);
+ 243   1              C_Word[6][8] = a[0];
+ 244   1              C_Word[6][9] = a[1];
+ 245   1              C_Word[6][10] = a[2];
+ 246   1              C_Word[6][11] = a[3];
+ 247   1              
+ 248   1              DEC_change_to_HEX(GPGGA_Buffer[31]);
+ 249   1              C_Word[6][12] = a[0];
+ 250   1              C_Word[6][13] = a[1];
+ 251   1              C_Word[6][14] = a[2];
+ 252   1              C_Word[6][15] = a[3];
+ 253   1              
+ 254   1              DEC_change_to_HEX(GPGGA_Buffer[32]);
+ 255   1              C_Word[6][16] = a[0];
+ 256   1              C_Word[6][17] = a[1];
+ 257   1              C_Word[6][18] = a[2];
+ 258   1              C_Word[6][19] = a[3];
+ 259   1              
+ 260   1              DEC_change_to_HEX(GPGGA_Buffer[33]);
+ 261   1              C_Word[6][24] = a[0];
+ 262   1              C_Word[6][25] = a[1];
+ 263   1              C_Word[6][26] = a[2];
+ 264   1              C_Word[6][27] = a[3];
+ 265   1              
+ 266   1              DEC_change_to_HEX(GPGGA_Buffer[34]);
+ 267   1              C_Word[6][28] = a[0];
+ 268   1              C_Word[6][29] = a[1];
+ 269   1              C_Word[6][30] = a[2];
+ 270   1              C_Word[6][31] = a[3];
+ 271   1              
+ 272   1              MIN_change_to_SEC();
+ 273   1              
+ 274   1              message_send();
+ 275   1      }
+ 276          
+ 277          void message_find()
+ 278          {
+ 279   1              unsigned char x = 0;
+ 280   1              
+ 281   1      //      unsigned char i = 0;
+ 282   1              
+ 283   1              uart2_send_str2("AT%IPDR\r\n");
+ 284   1              com_send_str2("AT%IPDR\r\n");
+ 285   1      
+ 286   1          uart2_receive_str(Message_Received);
+ 287   1              
+ 288   1              com_send_str(50, Message_Received);
+ 289   1              
+ 290   1              for(x = 0; x < 50; x++)
+ 291   1              {
+ 292   2                      if(Message_Received[x] == 'E')
+ 293   2                      {
+ 294   3                              com_send_str2("EEEEEEEEEEEE\n");
+ 295   3                              uart2_send_str2("EEEEEEEEEEEE\n");
+ 296   3                              break;
+ 297   3                      } else if(Message_Received[x] == 'K') {
+ 298   3                              x = 0;
+ 299   3                              uart2_send_str2("AT%IPDR\r\n");
+C51 COMPILER V9.51   GSM900C                                                               05/03/2017 15:39:49 PAGE 6   
+
+ 300   3                              com_send_str2("AT%IPDR\r\n");
+ 301   3              
+ 302   3                              uart2_receive_str(Message_Received);
+ 303   3              
+ 304   3                              com_send_str(50, Message_Received);
+ 305   3                      } else if(Message_Received[x] == '\"') {
+ 306   3                              if(x == 49)
+ 307   3                              {
+ 308   4                                      uart2_receive_str(Message_Received);
+ 309   4                                      x = 0;
+ 310   4                              } else {
+ 311   4                                      x = x + 1;
+ 312   4                              }
+ 313   3                              if(Message_Received[x] == '4') 
+ 314   3                              {
+ 315   4                                      if(x == 49)
+ 316   4                                      {
+ 317   5                                              uart2_receive_str(Message_Received);
+ 318   5                                              x = 0;
+ 319   5                                      } else {
+ 320   5                                              x = x + 1;
+ 321   5                                      }
+ 322   4                                      switch(Message_Received[x])
+ 323   4                                      {
+ 324   5                                              case '1':
+ 325   5                                              {
+ 326   6                                                      com_send_str2("11111111111\n");uart2_send_str2("11111111111111\r\n");
+ 327   6                                                      
+ 328   6                                                      while(Message_Received[x] != '\"')
+ 329   6                                                      {
+ 330   7                                                              if(x == 49)
+ 331   7                                                              {
+ 332   8                                                                      uart2_receive_str(Message_Received);
+ 333   8                                                                      x = 1;
+ 334   8                                                              } else {
+ 335   8                                                                      x = x + 1;
+ 336   8                                                              }
+ 337   7                                                      }
+ 338   6                                              }
+ 339   5                                              break;
+ 340   5                                              case '2':
+ 341   5                                              {
+ 342   6                                                      com_send_str2("22222222222\n");
+ 343   6                                                      uart2_send_str2("22222222222222\r\n");
+ 344   6                                                              
+ 345   6                                                      while(Message_Received[x] != '\"')
+ 346   6                                                      {
+ 347   7                                                              if(x == 49)
+ 348   7                                                              {
+ 349   8                                                                      uart2_receive_str(Message_Received);
+ 350   8                                                                      x = 1;
+ 351   8                                                              } else {
+ 352   8                                                                      x = x + 1;
+ 353   8                                                              }
+ 354   7                                                      }
+ 355   6                                              }
+ 356   5                                              break;
+ 357   5                                              case '3':
+ 358   5                                              {
+ 359   6                                              }
+ 360   5                                              break;
+ 361   5                                              case '4':
+C51 COMPILER V9.51   GSM900C                                                               05/03/2017 15:39:49 PAGE 7   
+
+ 362   5                                              {
+ 363   6                                              }
+ 364   5                                              break;
+ 365   5                                              default:
+ 366   5                                              {
+ 367   6                                                      while(Message_Received[x] != '\"')
+ 368   6                                                      {
+ 369   7                                                              if(x == 49)
+ 370   7                                                              {
+ 371   8                                                                      uart2_receive_str(Message_Received);
+ 372   8                                                                      x = 1;
+ 373   8                                                              } else {
+ 374   8                                                                      x = x + 1;
+ 375   8                                                              }
+ 376   7                                                      }
+ 377   6                                              }
+ 378   5                                      }
+ 379   4                                      
+ 380   4                              } else {
+ 381   4                                      while(Message_Received[x] != '\"')
+ 382   4                                      {
+ 383   5                                              if(x == 49)
+ 384   5                                              {
+ 385   6                                                      uart2_receive_str(Message_Received);
+ 386   6                                                      x = 1;
+ 387   6                                              } else {
+ 388   6                                                      x = x + 1;      
+ 389   6                                              }
+ 390   5                                      }
+ 391   4                              }                       
+ 392   3                      } else if(x == 49){
+ 393   3                              uart2_receive_str(Message_Received);
+ 394   3                              x = 0;
+ 395   3                      }
+ 396   2      
+ 397   2              }
+ 398   1      }
+ 399          
+ 400          //void message_receive()
+ 401          //{
+ 402          //      uart2_send_str2(Rewrite_Close);
+ 403          //      Delay_s(1);
+ 404          //      
+ 405          //      uart2_send_str2(E_Control[0]);
+ 406          //      Delay_s(1);
+ 407          //      
+ 408          //      uart2_send_str2(E_Control[1]);
+ 409          //      Delay_s(1);
+ 410          //      
+ 411          //      uart2_send_str2(Unread_Message);
+ 412          //      message_find();
+ 413          //      
+ 414          ////    uart2_send_str2(Read_Message_Clean);
+ 415          //}
+ 416          
+ 417          void tCPSend(unsigned char *s)
+ 418          {
+ 419   1              uart2_send_str2("AT%IPSEND=\"");
+ 420   1              com_send_str2("AT%IPSEND=\"");
+ 421   1              uart2_send_str5(s);
+ 422   1              com_send_str5(s);
+ 423   1              uart2_send_str2("0d0a\"\r\n");
+C51 COMPILER V9.51   GSM900C                                                               05/03/2017 15:39:49 PAGE 8   
+
+ 424   1              com_send_str2("0d0a\"\r\n");
+ 425   1      }
+ 426          
+ 427          void carLocationSend(unsigned char stolen)
+ 428          {
+ 429   1              unsigned char x = 12;
+ 430   1              unsigned char y = 13;
+ 431   1              unsigned char z = 17;
+ 432   1              unsigned char i = 0;
+ 433   1              
+ 434   1              sprintf(C_Words, "41313030303000000000000000000000000000000000000000000030\n");
+ 435   1              
+ 436   1              for(i = 0; i < 4; i++,z++,x=x+2,y=y+2)
+ 437   1              {
+ 438   2                      DEC_change_to_HEX(GPGGA_Buffer[z]);
+ 439   2                      C_Words[x] = a[2];
+ 440   2                      C_Words[y] = a[3];
+ 441   2              }
+ 442   1              for(i = 0,z = 22; i < 5; i++,z++,x=x+2,y=y+2)
+ 443   1              {
+ 444   2                      DEC_change_to_HEX(GPGGA_Buffer[z]);
+ 445   2                      C_Words[x] = a[2];
+ 446   2                      C_Words[y] = a[3];
+ 447   2              }
+ 448   1              DEC_change_to_HEX(GPGGA_Buffer[28]);
+ 449   1              C_Words[30] = a[2];
+ 450   1              C_Words[31] = a[3];
+ 451   1              for(i = 0,z = 30,x = 32,y = 33; i < 5; i++,z++,x=x+2,y=y+2)
+ 452   1              {
+ 453   2                      DEC_change_to_HEX(GPGGA_Buffer[z]);
+ 454   2                      C_Words[x] = a[2];
+ 455   2                      C_Words[y] = a[3];
+ 456   2              }
+ 457   1              for(i = 0,z = 36,x = 42,y = 43; i < 5; i++,z++,x=x+2,y=y+2)
+ 458   1              {
+ 459   2                      DEC_change_to_HEX(GPGGA_Buffer[z]);
+ 460   2                      C_Words[x] = a[2];
+ 461   2                      C_Words[y] = a[3];
+ 462   2              }
+ 463   1              DEC_change_to_HEX(GPGGA_Buffer[42]);
+ 464   1              C_Words[52] = a[2];
+ 465   1              C_Words[53] = a[3];
+ 466   1              
+ 467   1              C_Words[55] = stolen;
+ 468   1              
+ 469   1              tCPSend(C_Words);
+ 470   1      }
+ 471          
+ 472          void tCPClose()
+ 473          {
+ 474   1              uart2_send_str2("AT%IPCLOSE\r\n");
+ 475   1      }
+ 476          
+ 477          void tCPLinks2()
+ 478          {
+ 479   1              uart2_send_str2(Rewrite_Close);
+ 480   1              Delay_s(1);
+ 481   1              
+ 482   1              uart2_send_str2("AT%IOMODE=1,1,0\r\n");                    //AT%IOMODE=1,1,0
+ 483   1              com_send_str2("AT%IOMODE=1,1,0\r\n");
+ 484   1              Delay_s(5);
+ 485   1              
+C51 COMPILER V9.51   GSM900C                                                               05/03/2017 15:39:49 PAGE 9   
+
+ 486   1              uart2_send_str2("AT+CGDCONT=1,\"IP\",\"CMNET\"\r\n");                    //AT+CGDCONT=1,"IP","CMNET"
+ 487   1              com_send_str2("AT+CGDCONT=1,\"IP\",\"CMNET\"\r\n");
+ 488   1              Delay_s(5);
+ 489   1              
+ 490   1              uart2_send_str2("AT%ETCPIP\r\n");                    //AT%ETCPIP
+ 491   1              com_send_str2("AT%ETCPIP\r\n");
+ 492   1              Delay_s(20);
+ 493   1              
+ 494   1              while(1)
+ 495   1              {
+ 496   2                  
+ 497   2                      if(C_Words[0] == 'C')
+ 498   2                      {
+ 499   3                              break;
+ 500   3                      } else{
+ 501   3                              uart2_send_str2("AT%IPOPEN=\"TCP\",\"");                    //AT%IPOPEN="TCP","
+ 502   3                              com_send_str2("AT%IPOPEN=\"TCP\",\"");
+ 503   3                              uart2_send_str3(0, "122.228.19.57\r");
+ 504   3                              com_send_str3(0, "122.228.19.57\r");
+ 505   3                              uart2_send_str2("\",14916,,4098\r\n");
+ 506   3                              com_send_str2("\",14916,,4098\r\n");
+ 507   3                              uart2_receive_str(C_Words);
+ 508   3                              com_send_str2(C_Words);
+ 509   3                              
+ 510   3                      }
+ 511   2              }
+ 512   1      
+ 513   1              Delay_s(5);
+ 514   1              uart2_send_str2("AT%IPSEND=\"");
+ 515   1              com_send_str2("AT%IPSEND=\"");
+ 516   1              uart2_send_str2(CarNumber);
+ 517   1              com_send_str2(CarNumber);
+ 518   1              uart2_send_str2("0d0a\"\r\n");
+ 519   1              com_send_str2("0d0a\"\r\n");
+ 520   1      
+ 521   1      }
+ 522          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   2232    ----
+   CONSTANT SIZE    =    288    ----
+   XDATA SIZE       =    758    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      8       8
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

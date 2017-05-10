@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8"/>
+	<classpathentry kind="lib" path="lib/spring/spring-aop-4.3.2.RELEASE.jar"/>
+	<classpathentry kind="lib" path="lib/spring/spring-aspects-4.3.2.RELEASE.jar"/>
+	<classpathentry kind="lib" path="lib/spring/spring-beans-4.3.2.RELEASE.jar"/>
+	<classpathentry kind="lib" path="lib/spring/spring-context-4.3.2.RELEASE.jar"/>
+	<classpathentry kind="lib" path="lib/spring/spring-context-support-4.3.2.RELEASE.jar"/>
+	<classpathentry kind="lib" path="lib/spring/spring-core-4.3.2.RELEASE.jar"/>
+	<classpathentry kind="lib" path="lib/spring/spring-expression-4.3.2.RELEASE.jar"/>
+	<classpathentry kind="lib" path="lib/spring/spring-instrument-4.3.2.RELEASE.jar"/>
+	<classpathentry kind="lib" path="lib/spring/spring-instrument-tomcat-4.3.2.RELEASE.jar"/>
+	<classpathentry kind="lib" path="lib/spring/spring-jdbc-4.3.2.RELEASE.jar"/>
+	<classpathentry kind="lib" path="lib/spring/spring-jms-4.3.2.RELEASE.jar"/>
+	<classpathentry kind="lib" path="lib/spring/spring-messaging-4.3.2.RELEASE.jar"/>
+	<classpathentry kind="lib" path="lib/spring/spring-orm-4.3.2.RELEASE.jar"/>
+	<classpathentry kind="lib" path="lib/spring/spring-oxm-4.3.2.RELEASE.jar"/>
+	<classpathentry kind="lib" path="lib/spring/spring-test-4.3.2.RELEASE.jar"/>
+	<classpathentry kind="lib" path="lib/spring/spring-tx-4.3.2.RELEASE.jar"/>
+	<classpathentry kind="lib" path="lib/spring/spring-web-4.3.2.RELEASE.jar"/>
+	<classpathentry kind="lib" path="lib/spring/spring-webmvc-4.3.2.RELEASE.jar"/>
+	<classpathentry kind="lib" path="lib/spring/spring-webmvc-portlet-4.3.2.RELEASE.jar"/>
+	<classpathentry kind="lib" path="lib/spring/spring-websocket-4.3.2.RELEASE.jar"/>
+	<classpathentry kind="lib" path="lib/commons/commons-logging-1.2.jar"/>
+	<classpathentry kind="lib" path="lib/spring/aopalliance-1.0.jar"/>
+	<classpathentry kind="lib" path="lib/spring/aspectjrt.jar"/>
+	<classpathentry kind="lib" path="lib/spring/aspectjweaver.jar"/>
+	<classpathentry kind="lib" path="lib/spring/cglib-nodep-2.1_3.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/C3P0"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Hibernate4.3"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/MySQL-connector-java-5.1.38"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>

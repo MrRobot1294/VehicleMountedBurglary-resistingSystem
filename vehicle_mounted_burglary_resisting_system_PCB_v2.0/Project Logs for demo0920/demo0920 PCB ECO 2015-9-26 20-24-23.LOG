@@ -1,0 +1,5 @@
+Added Component: Designator=c1(CON2)
+Added Pin To Net: NetName=GND Pin=c1-1
+Added Pin To Net: NetName=VCC Pin=c1-2
+Added Member To Class: ClassName=demo0920 Member=Component c1 con2
+Added Room: Name=demo0920

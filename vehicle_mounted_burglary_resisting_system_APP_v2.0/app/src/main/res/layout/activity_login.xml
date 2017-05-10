@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/activity_logn_in"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="com.cjy.safecar.login.LoginActivity">
+    <ImageView
+        android:id="@+id/userloginpicture"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/pic_default_avatar"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp"/>
+
+    <TextView
+        android:id="@+id/info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="请输入正确的账号密码"
+        android:layout_marginTop="50dp"
+        android:layout_centerHorizontal="true"
+        android:textColor="#f50606"
+        android:layout_below="@id/userloginpicture"
+        android:visibility="invisible"/>
+
+    <ImageView
+        android:id="@+id/personpicture"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/info"
+        android:src="@mipmap/logo_user"
+        android:layout_marginTop="10dp"
+        android:layout_marginLeft="20dp"/>
+    <EditText
+        android:id="@+id/telephonnumber"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:inputType="phone"
+        android:hint="请输入电话号码"
+        android:textColorHint="#95A1AA"
+        android:maxLines="1"
+        android:maxLength="20"
+        android:layout_toRightOf="@id/personpicture"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="20dp"
+        android:layout_alignBottom="@id/personpicture" />
+    <ImageView
+        android:id="@+id/passwordpicture"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/personpicture"
+        android:src="@mipmap/logo_password"
+        android:layout_marginTop="20dp"
+        android:layout_marginLeft="20dp"/>
+    <EditText
+        android:id="@+id/password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="请输入密码"
+        android:inputType="textPassword"
+        android:textColorHint="#95A1AA"
+        android:maxLines="1"
+        android:maxLength="20"
+        android:layout_toRightOf="@id/passwordpicture"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="20dp"
+        android:layout_alignBottom="@id/passwordpicture"/>
+    <Button
+        android:id="@+id/signin"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/passwordpicture"
+        android:layout_margin="20dp"
+        android:text="登 录"
+        android:textColor="#111"
+        android:textSize="30sp"
+        android:background="#ff4848"/>
+    <Button
+        android:id="@+id/signup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/signin"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:text="注 册"
+        android:textColor="#111"
+        android:textSize="30sp"
+        android:background="#ffffff" />
+
+</RelativeLayout>

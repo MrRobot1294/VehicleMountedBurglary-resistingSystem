@@ -1,0 +1,12 @@
+Added Component: Designator=p1(PAIZU_9)
+Added Pin To Net: NetName=VCC Pin=p1-1
+Added Pin To Net: NetName=Netp1_2 Pin=p1-2
+Added Pin To Net: NetName=Netp1_3 Pin=p1-3
+Added Pin To Net: NetName=Netp1_4 Pin=p1-4
+Added Pin To Net: NetName=Netp1_5 Pin=p1-5
+Added Pin To Net: NetName=Netp1_6 Pin=p1-6
+Added Pin To Net: NetName=Netp1_7 Pin=p1-7
+Added Pin To Net: NetName=Netp1_8 Pin=p1-8
+Added Pin To Net: NetName=Netp1_9 Pin=p1-9
+Added Member To Class: ClassName=demo0920 Member=Component p1 PAIZU_9
+Added Room: Name=demo0920

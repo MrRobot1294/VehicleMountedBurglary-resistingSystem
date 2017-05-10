@@ -1,0 +1,4 @@
+Change Component Designator: OldDesignator=LED1 NewDesignator=SYS
+Change Component Designator: OldDesignator=LED2 NewDesignator=POWER
+Change Component Designator: OldDesignator=SW1 NewDesignator=RESET
+Change Component Designator: OldDesignator=SW2 NewDesignator=SWITCH

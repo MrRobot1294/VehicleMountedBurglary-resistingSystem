@@ -1,0 +1,253 @@
+C51 COMPILER V9.51   CAR                                                                   05/03/2017 15:39:48 PAGE 1   
+
+
+C51 COMPILER V9.51, COMPILATION OF MODULE CAR
+OBJECT MODULE PLACED IN car.OBJ
+COMPILER INVOKED BY: F:\keil_for_arm\C51\BIN\C51.EXE car.c OPTIMIZE(8,SPEED) BROWSE INCDIR(.\Delay;.\LCD;.\uart;.\gps;.\
+                    -gsm900c;.\uart2_STC12C5A60S2;.\NRF24L01;..\≥µ‘ÿ∑¿µ¡) DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          #include "STC12C5A60S2.H"
+   2          #include "uart2_STC12C5A60S2.h"
+   3          #include "NRF24L01.h"
+   4          #include "gsm900c.h"
+   5          #include "gps.h"
+   6          #include "Delay.h"
+   7          #include "uart.h"
+   8          #include "car.h"
+   9          
+  10          sbit LED = P0^0;
+  11          sbit BEEP = P0^1;
+  12          
+  13          sbit BE_STOLEN = P1^0;
+  14          
+  15          //bit Flag_OV = 0;
+  16          bit Flag_GPGGA_OK = 0;
+  17          bit Flag_GPRMC_OK = 0;
+  18          bit Flag_SWITCH = 1;
+  19          bit Flag_BE_STOLEN = 0;
+  20          
+  21          unsigned char Send_Timer = 0;
+  22          
+  23          int Timer = 0;
+  24          
+  25          void interrupt_init()
+  26          {
+  27   1              EA = 1;           
+  28   1              ET0 = 1;
+  29   1      
+  30   1          IT0 = 0;
+  31   1          EX0 = 1;    
+  32   1              
+  33   1              TMOD = 0x01 | TMOD;      
+  34   1              
+  35   1              TR0 = 0;
+  36   1              
+  37   1              TH0 = (65536 - 50000) / 256;     
+  38   1              TL0 = (65536 - 50000) % 256;
+  39   1      }
+  40          
+  41          void timer_interrupt1() interrupt 1
+  42          {                       
+  43   1              TH0 = (65536 - 50000) / 256;
+  44   1              TL0 = (65536 - 50000) % 256;
+  45   1              
+  46   1              Timer++;
+  47   1              if(Timer % 10 == 0)
+  48   1              {
+  49   2                  BEEP = ~BEEP;
+  50   2                      //BEEP = 0;
+  51   2              }
+  52   1              
+  53   1      //      uart2_sendonebyte('1');
+  54   1      //      com_send_byte('2');
+C51 COMPILER V9.51   CAR                                                                   05/03/2017 15:39:48 PAGE 2   
+
+  55   1              
+  56   1              if(Timer == 1200)
+  57   1              {
+  58   2                      Timer = 0;
+  59   2                      
+  60   2                              com_send_byte('2');
+  61   2                      
+  62   2                      Send_Timer--;
+  63   2                      
+  64   2              }
+  65   1      }
+  66          
+  67          void Int0_ISR() interrupt 0
+  68          {
+  69   1          unsigned char RxDate[5]={0};
+  70   1      
+  71   1          if( NRFRevDate(RxDate) )
+  72   1          {
+  73   2              if(RxDate[0]==1&&RxDate[2]==3&&RxDate[1]==2&&RxDate[3]==4)
+  74   2              { 
+  75   3      //            com_send_str(4, RxDate);
+  76   3                  Delay_ms(200);
+  77   3                              
+  78   3                              if(Flag_SWITCH)
+  79   3                              {
+  80   4                                      Flag_SWITCH = 0;
+  81   4                                      LED = 1;
+  82   4                              }
+  83   3                              else
+  84   3                              {
+  85   4                                      Flag_SWITCH = 1;
+  86   4                                      LED = 0;
+  87   4                              }
+  88   3              } 
+  89   2          }
+  90   1          NRFSetRXMode();
+  91   1      }
+  92          
+  93          
+  94          void main()
+  95          {
+  96   1              unsigned char i = 0;
+  97   1              
+  98   1              LED = 0;
+  99   1              BEEP = 1;
+ 100   1              
+ 101   1              BE_STOLEN = 1;
+ 102   1              
+ 103   1              uart2_init();
+ 104   1              
+ 105   1              com_init();
+ 106   1              
+ 107   1              interrupt_init();
+ 108   1              
+ 109   1              tCPLinks2();
+ 110   1              Delay_s(40);
+ 111   1              
+ 112   1      //      NRF24L01Int();
+ 113   1      //      NRFSetRXMode(); 
+ 114   1                      
+ 115   1              while(1)
+ 116   1              {
+C51 COMPILER V9.51   CAR                                                                   05/03/2017 15:39:48 PAGE 3   
+
+ 117   2                      if(Flag_SWITCH == 1)
+ 118   2                      {
+ 119   3                              gps_init();
+ 120   3                              
+ 121   3                              TR0 = 1;
+ 122   3                              if((BE_STOLEN == 1) && (Flag_BE_STOLEN == 0))
+ 123   3                              {
+ 124   4                                      Send_Timer = 0;
+ 125   4                              
+ 126   4                                      GPGGA_Buffer[17] = 'A';
+ 127   4                                      
+ 128   4                                      Flag_BE_STOLEN = 1;
+ 129   4                                      
+ 130   4                              }
+ 131   3                              if(BE_STOLEN == 0)
+ 132   3                              {
+ 133   4                                      Flag_BE_STOLEN = 0;
+ 134   4                              }
+ 135   3                              while((Flag_GPS_OK != 1) && (Send_Timer <= 0))
+ 136   3                              {
+ 137   4                                      //TR0 = 0;
+ 138   4                                      
+ 139   4                                      Send_Timer = 0;
+ 140   4                                      
+ 141   4                                      gps_receive();
+ 142   4                              }
+ 143   3      
+ 144   3                              if((Send_Timer == 0) && 
+ 145   3                                      (Flag_GPS_OK == 1) && 
+ 146   3                                      ((GPGGA_Buffer[17] != RX_Buffer[17] || GPGGA_Buffer[18] != RX_Buffer[18] || GPGGA_Buffer[19] != RX_Buf
+             -fer[19] || GPGGA_Buffer[20] != RX_Buffer[20] || GPGGA_Buffer[22] != RX_Buffer[22] || GPGGA_Buffer[23] != RX_Buffer[23] |
+             -| GPGGA_Buffer[24] != RX_Buffer[24]) ||
+ 147   3                                  (GPGGA_Buffer[30] != RX_Buffer[30] || GPGGA_Buffer[31] != RX_Buffer[31] || GPGGA_Buffer[32] != RX_B
+             -uffer[32] || GPGGA_Buffer[33] != RX_Buffer[33] || GPGGA_Buffer[34] != RX_Buffer[34] || GPGGA_Buffer[36] != RX_Buffer[36]
+             - || GPGGA_Buffer[37] != RX_Buffer[37] || GPGGA_Buffer[38] != RX_Buffer[38]))
+ 148   3                                )
+ 149   3                              {
+ 150   4                                      
+ 151   4                                      for(i = 0; i < 68; i++)
+ 152   4                                      {
+ 153   5                                              GPGGA_Buffer[i] = RX_Buffer[i];
+ 154   5                                      }
+ 155   4                                      
+ 156   4                                      Flag_GPGGA_OK = 1;
+ 157   4                                      
+ 158   4                                      if(BE_STOLEN == 1)
+ 159   4                                      {
+ 160   5                                              carLocationSend('1');
+ 161   5                                              
+ 162   5                                      } else {
+ 163   5                                              carLocationSend('0');
+ 164   5                                      }
+ 165   4                              }
+ 166   3                              
+ 167   3                              if(Flag_GPGGA_OK == 1 && BE_STOLEN == 1)
+ 168   3                              {
+ 169   4                                      full_C_Word();
+ 170   4                                      
+ 171   4                                      Flag_GPGGA_OK = 0;
+ 172   4                              }
+ 173   3                              Flag_GPGGA_OK = 0;
+ 174   3                              
+C51 COMPILER V9.51   CAR                                                                   05/03/2017 15:39:48 PAGE 4   
+
+ 175   3                              Flag_GPS_OK = 0;
+ 176   3                              
+ 177   3                              Send_Timer = 3;
+ 178   3                              
+ 179   3                              TR0 = 1;
+ 180   3                      }
+ 181   2                      else
+ 182   2                      {
+ 183   3                              interrupt_init();
+ 184   3                              
+ 185   3                              BEEP = 1;
+ 186   3                              
+ 187   3                              Send_Timer = 0;
+ 188   3                              
+ 189   3                              GPGGA_Buffer[17] = 'A';
+ 190   3                      }
+ 191   2                      
+ 192   2      //              message_receive();
+ 193   2                      
+ 194   2                      if(Flag_SWITCH)
+ 195   2                  {
+ 196   3                              LED = 0;
+ 197   3                      }
+ 198   2                      else
+ 199   2                      {
+ 200   3                          LED = 1;
+ 201   3                      }
+ 202   2                      
+ 203   2      // //           com_send_byte('1');
+ 204   2      //              uart2_send_str2(Control[0]);
+ 205   2              }
+ 206   1      
+ 207   1      //      tCPClose();
+ 208   1              
+ 209   1      //      while(1)
+ 210   1      //      {
+ 211   1      //      }
+ 212   1      }
+ 213          
+ 214          
+ 215          
+ 216          
+ 217          
+ 218          
+ 219          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    639    ----
+   CONSTANT SIZE    =      5    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =      3       6
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      4    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

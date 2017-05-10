@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://hibernate.sourceforge.net/hibernate-mapping-3.0.dtd">
+<!-- Generated 2017-4-3 20:18:22 by Hibernate Tools 3.5.0.Final -->
+<hibernate-mapping>
+    <class name="com.nj.cjy.safecar.mappings.CarLocation" table="CAR_LOCATION">
+        <id name="id" type="int">
+            <column name="ID" />
+            <generator class="native" />
+        </id>
+        <many-to-one name="car" class="com.nj.cjy.safecar.mappings.Car" fetch="join">
+            <column name="CAR" />
+        </many-to-one>
+        <property name="date" type="java.util.Calendar" not-null="true">
+            <column name="DATE" />
+        </property>
+        <property name="state" type="java.lang.String" not-null="true">
+            <column name="STATE" />
+        </property>
+        <property name="longitude" type="java.lang.String" not-null="true">
+            <column name="LONGITUDE" />
+        </property>
+        <property name="latitude" type="java.lang.String" not-null="true">
+            <column name="LATITUDE" />
+        </property>
+    </class>
+</hibernate-mapping>
