@@ -1,6 +1,8 @@
 # VehicleMountedBurglary-resistingSystem V2.0
 stc12c5a60s2  gtm900c gps Spring Hibernate MySQL Android 高德地图API
 
+具有被盗消息短信通知，用户注册登录，用户车辆增删，用户车辆实时位置状态查询，用户车辆历史位置状态与轨迹查询功能。
+
 Hardware:
 1.将gsm900c.c文件第23行XXXXXXXXXXFX替换为需要短信通知的手机号码。
   例如：手机号123456789AB 填为 21436587A9FB
